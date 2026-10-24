@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sociales: Los Ulúas</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(160deg,#fff6d6,#d9f2ff);color:#1f2a44;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:16px}h1{text-align:center;font-size:2rem;margin:10px 0}h2{font-size:1.5rem;margin:8px 0}
+.card{background:#fff;border-radius:20px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.1);margin:14px 0}
+.btn{display:block;width:100%;font-size:1.3rem;padding:16px;margin:8px 0;border:0;border-radius:16px;cursor:pointer;color:#fff;background:#2b8de2;font-weight:700}
+.btn.g{background:#22a35a}.btn.o{background:#f08a24}.btn.r{background:#c7362b}.btn.gray{background:#8a94a8}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row .btn{flex:1;min-width:140px}
+.topics label{display:block;font-size:1.25rem;padding:10px;background:#e8f3ff;border-radius:12px;margin:6px 0;cursor:pointer}
+.topics input{transform:scale(1.5);margin-right:12px}
+.q{font-size:1.45rem;font-weight:700;margin:6px 0 14px}.opt{background:#eef1f6;color:#1f2a44;text-align:left}
+.opt.ok{background:#22a35a;color:#fff}.opt.bad{background:#c7362b;color:#fff}
+.exp{font-size:1.15rem;background:#fff6d6;border-left:6px solid #ffbf00;padding:12px;border-radius:10px;margin-top:10px}
+.stats{display:flex;justify-content:space-between;font-size:1.15rem;font-weight:700;flex-wrap:wrap;gap:8px}
+.tag{display:inline-block;padding:4px 10px;border-radius:10px;background:#ffd9cc;font-size:.95rem;font-weight:700}
+.fc{min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.4rem;cursor:pointer;background:#e8f3ff}
+.timer{font-size:2rem;text-align:center;font-weight:800;color:#c7362b}.hid{display:none}.msg{font-size:1.3rem;text-align:center;font-weight:700;min-height:1.6em}
+ul{font-size:1.1rem}li{margin:6px 0}
+</style></head><body><div class="wrap">
+<p style="margin:0"><a href="https://korckyjals-grok-bot.github.io/sociales/" style="color:#2b8de2;font-weight:700;text-decoration:none">⬅️ Todos los pueblos</a></p>
+<h1>🏞️ Sociales: Los Ulúas</h1>
+<div id="home" class="card">
+<p style="font-size:1.2rem;text-align:center">¡Hola, amiguito! ¡Aprende sobre los ulúas jugando!</p>
+<button class="btn g" onclick="showStudy()">📖 Estudiar</button>
+<div class="topics" id="topics">
+<label><input type="checkbox" value="ori" checked>🗺️ Origen y territorio</label>
+<label><input type="checkbox" value="vid" checked>🌽 Vida y cultura</label>
+<label><input type="checkbox" value="con" checked>🛡️ Conquista y legado</label>
+</div>
+<div class="row"><button class="btn" onclick="startPractice()">✏️ Practicar</button><button class="btn o" onclick="startChallenge()">⏱️ Desafío 60 s</button></div>
+<p style="text-align:center;font-size:1.1rem">🏆 Récord del desafío: <b id="best">0</b></p>
+</div>
+<div id="study" class="card hid">
+<h2 id="stTitle"></h2><div class="row" id="stTabs"></div>
+<div id="fc" class="card fc" onclick="flip()"></div>
+<p style="text-align:center">Toca la tarjeta para ver la respuesta</p>
+<div class="row"><button class="btn gray" onclick="moveFc(-1)">⬅️ Anterior</button><button class="btn" onclick="moveFc(1)">Siguiente ➡️</button></div>
+<button class="btn r" onclick="home()">🏠 Inicio</button>
+</div>
+<div id="play" class="card hid">
+<div class="stats"><span>✅ <span id="sc">0</span></span><span>🔥 Racha: <span id="st">0</span></span><span id="cnt"></span></div>
+<div id="tm" class="timer hid"></div>
+<p><span class="tag" id="tg"></span></p>
+<div class="q" id="qt"></div><div id="opts"></div>
+<div id="msg" class="msg"></div><div id="exp" class="exp hid"></div>
+<button class="btn g hid" id="nx" onclick="next()">Siguiente ➡️</button>
+<button class="btn r" onclick="finish()">Terminar</button>
+</div>
+<div id="sum" class="card hid"><h2 id="sumT"></h2><p id="sumP" style="font-size:1.2rem"></p><div id="sumL"></div>
+<button class="btn o hid" id="rep" onclick="repeatErrors()">🔁 Repasar errores</button>
+<button class="btn" onclick="home()">🏠 Inicio</button></div>
+</div>
+<script>
+const TN={"ori": "Origen y territorio", "vid": "Vida y cultura", "con": "Conquista y legado"};
+const Q=[{"c": "ori", "t": "m", "q": "¿En qué zona de El Salvador se menciona a los ulúas?", "o": ["En el oriente", "En el occidente, en Ahuachapán", "En Chalatenango", "En San Salvador"], "e": "Los documentos los ubican en el oriente del país."}, {"c": "ori", "t": "m", "q": "¿En qué antigua provincia colonial mencionó un español la lengua «ulúa» en el siglo XVI?", "o": ["La provincia de San Miguel", "La provincia de Sonsonate", "Guatemala", "Panamá"], "e": "Diego García de Palacio mencionó la lengua ulúa en la provincia de San Miguel (1576)."}, {"c": "ori", "t": "m", "q": "¿Cómo se llama el gran río de Honduras con el mismo nombre?", "o": ["Río Ulúa", "Río Lempa", "Río Bravo", "Río Amazonas"], "e": "El río Ulúa está en Honduras; el nombre se usó para varios pueblos de la región."}, {"c": "ori", "t": "m", "q": "¿A qué familia de lenguas pertenecen las lenguas llamadas ulúa?", "o": ["Misumalpa", "Maya", "Nahua", "Otomangue"], "e": "Las lenguas ulúa forman parte de la familia misumalpa."}, {"c": "ori", "t": "m", "q": "¿Qué otros idiomas son de la familia misumalpa?", "o": ["Misquito, sumo (mayangna), matagalpa y cacaopera", "Inglés y alemán", "Náhuat y náhuatl", "Maya y poqomam"], "e": "«Misumalpa» viene de MIskito + SUmo + MATAgalpa."}, {"c": "ori", "t": "v", "q": "«Ulúa» es un nombre que se usó de forma poco clara para varios pueblos de Honduras, Nicaragua y El Salvador.", "a": true, "e": "¡Cierto! Por eso hay confusión entre ulúas y cacaoperas."}, {"c": "ori", "t": "m", "q": "¿Con qué pueblo de Morazán se relaciona a los ulúas de El Salvador?", "o": ["Con los cacaoperas (kakawiras)", "Con los pipiles de Izalco", "Con los aztecas", "Con los incas"], "e": "El investigador Walter Lehmann relacionó la lengua ulúa de San Miguel con el cacaopera."}, {"c": "ori", "t": "m", "q": "¿Desde dónde habrían llegado los pueblos misumalpas a El Salvador, según varios estudios?", "o": ["Desde Honduras y Nicaragua, hacia el este", "Desde México", "Desde Europa", "Desde Perú"], "e": "Sus parientes vivían hacia la costa atlántica de Honduras y Nicaragua."}, {"c": "ori", "t": "m", "q": "¿Qué es la costa atlántica o caribe de Centroamérica?", "o": ["La costa del lado del mar Caribe", "Un volcán", "Una isla del Pacífico", "Una montaña de nieve"], "e": "Allí viven hoy los misquitos y mayangnas."}, {"c": "ori", "t": "v", "q": "En El Salvador, los ulúas eran un grupo grande que vivía en todo el país.", "a": false, "e": "Falso. Eran pequeños grupos en el oriente y nororiente."}, {"c": "ori", "t": "m", "q": "¿Qué pueblos vecinos tenían los ulúas en el oriente?", "o": ["Lencas y cacaoperas", "Pocomames", "Incas", "Aztecas"], "e": "Vivían cerca de lencas y cacaoperas."}, {"c": "ori", "t": "m", "q": "¿Qué lengua hablan hoy muchas personas en la costa caribe de Nicaragua, emparentada con el ulúa?", "o": ["Misquito", "Náhuat", "Potón", "Poqomam"], "e": "El misquito es la lengua misumalpa más hablada hoy."}, {"c": "ori", "t": "m", "q": "¿Qué otra lengua viva se llama «ulwa» y se habla en Nicaragua?", "o": ["El ulwa de Karawala", "El mangue", "El chortí", "El lenca"], "e": "En Karawala (Nicaragua) aún hay hablantes de ulwa."}, {"c": "ori", "t": "v", "q": "Los expertos todavía discuten quiénes eran exactamente los ulúas de El Salvador.", "a": true, "e": "¡Cierto! Hay pocos documentos y muchas dudas."}, {"c": "vid", "t": "m", "q": "¿Cuál era probablemente su alimento principal, como en toda la región?", "o": ["El maíz", "El trigo", "El arroz", "La papa"], "e": "El maíz era básico en toda Mesoamérica y alrededores."}, {"c": "vid", "t": "m", "q": "¿Qué otros cultivos eran comunes en la región?", "o": ["Frijol, ayote, yuca y chile", "Uvas y aceitunas", "Trigo y avena", "Kiwis"], "e": "La yuca era importante entre los pueblos misumalpas."}, {"c": "vid", "t": "m", "q": "¿Qué hacían en los ríos?", "o": ["Pescaban y conseguían agua", "Esquiaban", "Patinaban sobre hielo", "Navegaban en lanchas de motor"], "e": "Los ríos daban peces y agua."}, {"c": "vid", "t": "m", "q": "¿Qué actividad hacían en los bosques?", "o": ["Cazaban y recolectaban frutos", "Construían rascacielos", "Jugaban videojuegos", "Sembraban trigo"], "e": "La caza y la recolección complementaban la agricultura."}, {"c": "vid", "t": "m", "q": "¿Qué animales se cazaban en los bosques de la región?", "o": ["Venados, armados y conejos", "Leones y cebras", "Canguros", "Osos polares"], "e": "Venado, cusuco (armado), conejo y aves."}, {"c": "vid", "t": "m", "q": "¿Cómo eran sus creencias, como las de pueblos vecinos?", "o": ["Respetaban la naturaleza y creían en varios espíritus o dioses", "Eran budistas", "No tenían ninguna", "Adoraban dioses griegos"], "e": "La espiritualidad estaba ligada a la naturaleza."}, {"c": "vid", "t": "m", "q": "¿Qué artesanías eran comunes en los pueblos del oriente?", "o": ["Cerámica, cestería y tejidos de fibras", "Joyas de platino", "Vidrio soplado", "Plástico"], "e": "Hacían vasijas, canastos y redes."}, {"c": "vid", "t": "m", "q": "¿Con qué construían sus casas?", "o": ["Madera, bahareque y techo de paja o palma", "Acero", "Ladrillo de vidrio", "Hielo"], "e": "Usaban materiales del entorno."}, {"c": "vid", "t": "v", "q": "Las comunidades se organizaban en pueblos con un jefe o señor.", "a": true, "e": "¡Cierto! Era común en la región tener jefes locales."}, {"c": "vid", "t": "m", "q": "¿Para qué servían las canoas en los pueblos misumalpas del Caribe?", "o": ["Para moverse por ríos y lagunas", "Para volar", "Para dormir", "Para cocinar"], "e": "Sus parientes del Caribe usaban mucho las canoas."}, {"c": "vid", "t": "m", "q": "¿Qué es la cestería?", "o": ["El arte de tejer canastos", "Un deporte", "Un tipo de comida", "Una canción"], "e": "Tejían canastos con fibras de plantas."}, {"c": "vid", "t": "v", "q": "Compartían alimentos como el maíz con otros pueblos de Centroamérica.", "a": true, "e": "¡Cierto! El maíz unía a los pueblos de la región."}, {"c": "con", "t": "m", "q": "¿Quiénes llegaron al oriente salvadoreño en el siglo XVI?", "o": ["Los españoles", "Los vikingos", "Los romanos", "Los chinos"], "e": "Los españoles fundaron San Miguel en 1530."}, {"c": "con", "t": "m", "q": "¿Qué ciudad fundaron los españoles en el oriente en 1530?", "o": ["San Miguel", "Santa Ana", "Sonsonate", "Ahuachapán"], "e": "San Miguel, en 1530."}, {"c": "con", "t": "v", "q": "La lengua ulúa de El Salvador ya no se habla.", "a": true, "e": "¡Cierto! Desapareció hace mucho en El Salvador."}, {"c": "con", "t": "m", "q": "¿Qué causó muchas muertes indígenas tras la conquista?", "o": ["Enfermedades de Europa", "El frío", "Los meteoritos", "Los dinosaurios"], "e": "Enfermedades como la viruela."}, {"c": "con", "t": "m", "q": "¿Por qué sabemos tan poco de los ulúas de El Salvador?", "o": ["Hay muy pocos documentos sobre ellos", "Porque eran invisibles", "Porque vivían en otro planeta", "Porque escribían en inglés"], "e": "Solo hay menciones cortas en documentos antiguos."}, {"c": "con", "t": "m", "q": "¿Quiénes estudian las lenguas antiguas?", "o": ["Los lingüistas", "Los bomberos", "Los pilotos", "Los chefs"], "e": "Los lingüistas comparan palabras para descubrir parentescos."}, {"c": "con", "t": "m", "q": "¿Qué palabra viene del nombre de tres lenguas: misquito, sumo y matagalpa?", "o": ["Misumalpa", "Mesoamérica", "Mayapán", "Matagalpa"], "e": "MI-SU-MALPA."}, {"c": "con", "t": "v", "q": "Los misquitos y mayangnas de Nicaragua y Honduras son parientes lingüísticos de los ulúas.", "a": true, "e": "¡Cierto! Todos son de la familia misumalpa."}, {"c": "con", "t": "m", "q": "¿Qué nos enseña la historia de los ulúas?", "o": ["Que El Salvador tuvo muchos pueblos diferentes", "Que nadie vivía aquí antes", "Que todos hablaban inglés", "Que solo hubo un pueblo"], "e": "Nuestro país tuvo gran diversidad de pueblos."}, {"c": "con", "t": "m", "q": "¿En qué parte de Honduras está el río Ulúa?", "o": ["En el norte, cerca del valle de Sula", "En el sur, junto al Pacífico", "En una isla", "En la capital"], "e": "El río Ulúa corre por el norte de Honduras, por el valle de Sula."}, {"c": "con", "t": "v", "q": "Es importante respetar y recordar a los pueblos originarios, aunque sepamos poco de ellos.", "a": true, "e": "¡Cierto! Son parte de nuestra historia."}, {"c": "ori", "t": "m", "q": "¿Qué país tiene hoy la lengua misumalpa con más hablantes?", "o": ["Nicaragua (y Honduras), con el misquito", "Japón", "Chile", "España"], "e": "El misquito se habla en Nicaragua y Honduras."}, {"c": "vid", "t": "m", "q": "¿Qué raíz comestible era importante entre los pueblos misumalpas?", "o": ["La yuca", "La papa europea", "El jengibre", "La remolacha"], "e": "La yuca es muy importante en la costa caribe."}, {"c": "con", "t": "m", "q": "¿Qué documento antiguo menciona a los ulúas en El Salvador?", "o": ["Una carta de Diego García de Palacio (1576)", "Un periódico de 1990", "Un libro de cuentos", "Un video"], "e": "García de Palacio escribió sobre la provincia de San Miguel en 1576."}];
+const CARDS={"ori": [["¿Quiénes eran los ulúas?", "Pequeños grupos del oriente de El Salvador mencionados en documentos del siglo XVI."], ["Primera mención", "Diego García de Palacio habló de la lengua ulúa en la provincia de San Miguel (1576)."], ["Familia de lenguas", "Misumalpa: misquito, sumo, matagalpa, cacaopera y ulwa."], ["Parientes", "Walter Lehmann relacionó el ulúa de San Miguel con el cacaopera."], ["Ojo: confusión", "«Ulúa» se usó para varios pueblos; los expertos aún discuten."], ["Ulwa hoy", "En Karawala, Nicaragua, aún se habla una lengua ulwa."]], "vid": [["Alimentación", "Maíz, frijol, ayote, yuca, pesca y caza."], ["Creencias", "Respeto a la naturaleza y sus espíritus."], ["Artesanías", "Cerámica, cestería y tejidos de fibras."], ["Organización", "Pueblos con jefes locales."], ["Yuca", "Raíz importante para los pueblos misumalpas."]], "con": [["La conquista", "Los españoles fundaron San Miguel en 1530."], ["Su lengua", "Ya no se habla en El Salvador."], ["¿Por qué sabemos poco?", "Hay muy pocos documentos sobre ellos."], ["Lección", "El Salvador tuvo muchos pueblos originarios distintos."]]};
+Q.forEach((q,i)=>q.id=i);
+const $=id=>document.getElementById(id);
+let pool=[],cur=null,score=0,streak=0,done=0,missed={},answered=false,chal=false,timer=null,left=0,weight={},last=-1;
+$("best").textContent=localStorage.getItem("uluas_best")||0;
+function show(id){["home","study","play","sum"].forEach(x=>$(x).classList.toggle("hid",x!==id))}
+function home(){stop();$("best").textContent=localStorage.getItem("uluas_best")||0;show("home")}
+function sel(){const s=[...document.querySelectorAll("#topics input:checked")].map(i=>i.value);return s.length?s:["ori","vid","con"]}
+let fcT="ori",fcI=0,fcF=false;
+function showStudy(){$("stTabs").innerHTML=Object.keys(TN).map(k=>`<button class="btn ${k==fcT?'g':'gray'}" onclick="fcT='${k}';fcI=0;showStudy()">${TN[k]}</button>`).join("");$("stTitle").textContent="📖 "+TN[fcT];fcF=false;drawFc();show("study")}
+function drawFc(){const c=CARDS[fcT][fcI];$("fc").innerHTML=fcF?`<div>${c[1]}</div>`:`<b>${c[0]}</b>`}
+function flip(){fcF=!fcF;drawFc()}
+function moveFc(d){const n=CARDS[fcT].length;fcI=(fcI+d+n)%n;fcF=false;drawFc();$("stTitle").textContent=`📖 ${TN[fcT]} (${fcI+1}/${n})`}
+function begin(list,isChal){pool=list;score=0;streak=0;done=0;missed={};weight={};last=-1;chal=isChal;list.forEach(q=>weight[q.id]=1);
+$("sc").textContent=0;$("st").textContent=0;show("play");stop();
+if(chal){left=60;$("tm").classList.remove("hid");$("tm").textContent="⏱️ 60";timer=setInterval(()=>{left--;$("tm").textContent="⏱️ "+left;if(left<=0)finish()},1000)}else $("tm").classList.add("hid");next()}
+function startPractice(){const s=sel();begin(Q.filter(q=>s.includes(q.c)),false)}
+function startChallenge(){const s=sel();begin(Q.filter(q=>s.includes(q.c)),true)}
+function repeatErrors(){begin(Q.filter(q=>missed[q.id]),false)}
+function stop(){if(timer){clearInterval(timer);timer=null}}
+function pick(){let tot=0;const c=pool.filter(q=>q.id!==last||pool.length==1);c.forEach(q=>tot+=weight[q.id]);let r=Math.random()*tot;for(const q of c){r-=weight[q.id];if(r<=0)return q}return c[0]}
+function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function next(){cur=pick();last=cur.id;answered=false;$("tg").textContent=TN[cur.c]+(cur.t=="v"?" · ¿Verdadero o falso?":"");
+$("qt").textContent=cur.q;$("cnt").textContent="Preguntas: "+done;
+let opts,right;if(cur.t=="m"){opts=shuf(cur.o);right=cur.o[0]}else if(cur.t=="v"){opts=["Verdadero","Falso"];right=cur.a?"Verdadero":"Falso"}else{opts=["Mayas","Pipiles"];right=cur.a}
+cur.right=right;$("opts").innerHTML="";opts.forEach(o=>{const b=document.createElement("button");b.className="btn opt";b.textContent=o;b.onclick=()=>answer(b,o);$("opts").appendChild(b)});
+$("msg").textContent="";$("exp").classList.add("hid");$("nx").classList.add("hid")}
+const GOOD=["¡Muy bien! 🎉","¡Excelente! ⭐","¡Correcto! 👏","¡Eres un crack! 🚀","¡Súper! 💪"];
+function answer(b,o){if(answered)return;answered=true;done++;const ok=o===cur.right;
+[...$("opts").children].forEach(x=>{if(x.textContent===cur.right)x.classList.add("ok")});
+if(ok){score++;streak++;weight[cur.id]=Math.max(1,weight[cur.id]-1);$("msg").textContent=GOOD[Math.floor(Math.random()*GOOD.length)]+(streak>=3?` ¡Racha de ${streak}! 🔥`:"")}
+else{b.classList.add("bad");streak=0;missed[cur.id]=1;weight[cur.id]+=3;$("msg").textContent="¡Casi! Mira la respuesta correcta 💡"}
+$("sc").textContent=score;$("st").textContent=streak;$("cnt").textContent="Preguntas: "+done;
+if(chal){setTimeout(()=>{if(chal&&left>0)next()},ok?600:1600);return}
+$("exp").textContent="ℹ️ "+cur.e;$("exp").classList.remove("hid");$("nx").classList.remove("hid")}
+function finish(){stop();const wasChal=chal;chal=false;let t="¡Buen trabajo, amiguito! 🌟";
+if(wasChal){const best=+(localStorage.getItem("uluas_best")||0);if(score>best){localStorage.setItem("uluas_best",score);t="🏆 ¡Nuevo récord: "+score+"!"}}
+$("sumT").textContent=t;$("sumP").textContent=`Respondiste bien ${score} de ${done} preguntas.`;
+const m=Q.filter(q=>missed[q.id]);$("sumL").innerHTML=m.length?"<h3>Para repasar:</h3><ul>"+m.map(q=>`<li><b>${q.q}</b><br>✔️ ${q.t=="m"?q.o[0]:q.t=="v"?(q.a?"Verdadero":"Falso"):q.a} — ${q.e}</li>`).join("")+"</ul>":"<p>¡No tuviste errores! 🎉</p>";
+$("rep").classList.toggle("hid",!m.length);show("sum")}
+</script></body></html>
